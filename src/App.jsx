@@ -1,35 +1,48 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState, useEffect } from 'react'
 import './App.css'
+import SearchGiphyFrom from './SearchGiphyForm/SearchGiphyForm'; 
 
 function App() {
-  const [count, setCount] = useState(0)
+
+  const [searchGif, setSearchGif] = useState('css');
+  const [giphy, setGiphy] = useState({})
+  
+  function getGiphySearch(gifTitle) {
+    setSearchGif(gifTitle)
+  }
+
+  useEffect(() => {
+    const giphyUrl = `http://www.api.giphy.com/v1/gifs/search?api_key=c9f7440b&t=${searchGif}`
+
+    async function getGiphyInfo() {
+      try{
+        const apiResponse = await fetch(giphyUrl);
+
+        const data = await apiResponse.json();
+        console.log(data);
+
+        setGiphy(data);
+
+      }catch(err) {
+        console.log(err, 'err from api call');
+      }
+    }
+
+    getGiphyInfo();
+    
+  }, [searchGif]);
+
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+    <p>The User Is Sraching For</p>
+    <SearchGiphyFrom getGiphySearch={getGiphySearch} />
+    {giphy.Title ? <GiphyInfo giphy={giphy}/> : null}
     </>
   )
 }
 
 export default App
+
+
+// api.giphy.com/v1/gifs/search?api_key=c9f7440b&t=${searchTerm}
